@@ -79,6 +79,13 @@ public class JdbcUserDao implements UserDao {
         return true;
     }
 
+    @Override
+    public BigDecimal getBalance(Long id) {
+        String sql = "SELECT balance FROM account where user_id = ?";
+        return jdbcTemplate.queryForObject(sql, BigDecimal.class, id);
+    }
+
+
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();
         user.setId(rs.getLong("user_id"));

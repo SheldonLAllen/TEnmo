@@ -1,14 +1,23 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleService {
 
     private final Scanner scanner = new Scanner(System.in);
+    private final String baseAPI;
+    private RestTemplate restTemplate = new RestTemplate();
+
+    public ConsoleService(String baseAPI) {
+        this.baseAPI = baseAPI;
+    }
 
     public int promptForMenuSelection(String prompt) {
         int menuSelection;
@@ -77,6 +86,10 @@ public class ConsoleService {
                 System.out.println("Please enter a decimal number.");
             }
         }
+    }
+
+    public void printUsers() {
+        List<User> users = restTemplate.getForObject(baseAPI + "/users", User.class);
     }
 
     public void pause() {
