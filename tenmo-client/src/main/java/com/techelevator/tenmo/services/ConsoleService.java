@@ -1,8 +1,12 @@
 package com.techelevator.tenmo.services;
 
 
+import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.util.BasicLogger;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
@@ -66,11 +70,11 @@ public class ConsoleService {
         return scanner.nextLine();
     }
 
-    public int promptForInt(String prompt) {
+    public Long promptForLong(String prompt) {
         System.out.print(prompt);
         while (true) {
             try {
-                return Integer.parseInt(scanner.nextLine());
+                return Long.parseLong(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a number.");
             }
@@ -89,7 +93,38 @@ public class ConsoleService {
     }
 
     public void printUsers() {
-        List<User> users = restTemplate.getForObject(baseAPI + "/users", User.class);
+        User[] users = null;
+        try {
+            users = restTemplate.getForObject(baseAPI + "/users", User[].class);
+            if (users == null) {
+                System.out.println("There are no users to send TE Bucks to.");
+            }
+            System.out.println("-----------------------------------------");
+            System.out.println("Users");
+            System.out.println("ID          Name");
+            System.out.println("-----------------------------------------");
+            for (User user : users) {
+                System.out.println(user.getId() + "        " + user.getUsername());
+            }
+            System.out.println("-----------------------------------------");
+        } catch (ResourceAccessException | RestClientResponseException e) {
+            BasicLogger.log(e.getMessage());
+        }
+    }
+
+    public boolean userExists(Long id) {
+        User[] users = null;
+        try {
+            users = restTemplate.getForObject(baseAPI + "/users", User[].class);
+            if (users != null) {
+                for (User user : users) {
+                    if (id.equals(user.getId())) return true;
+                }
+            }
+        } catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return false;
     }
 
     public void pause() {

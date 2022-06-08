@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -45,6 +46,8 @@ public class JdbcUserDao implements UserDao {
         return users;
     }
 
+
+
     @Override
     public User findByUsername(String username) throws UsernameNotFoundException {
         String sql = "SELECT user_id, username, password_hash FROM tenmo_user WHERE username ILIKE ?;";
@@ -85,6 +88,18 @@ public class JdbcUserDao implements UserDao {
         return jdbcTemplate.queryForObject(sql, BigDecimal.class, id);
     }
 
+    @Override
+    public List<Transfer> getTransfers() {
+        String sql = "SELECT * FROM transfer";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+        List<Transfer> transfers = new ArrayList<>();
+        while (results.next()) {
+            transfers.add(mapRowToTransfer(results));
+        }
+        return transfers;
+    }
+
+
 
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();
@@ -94,5 +109,16 @@ public class JdbcUserDao implements UserDao {
         user.setActivated(true);
         user.setAuthorities("USER");
         return user;
+    }
+
+    private Transfer mapRowToTransfer(SqlRowSet set) {
+        Transfer transfer = new Transfer();
+        transfer.setTransferId(set.getLong("transfer_id"));
+        transfer.setTransferTypeId(set.getLong("transfer_type_id"));
+        transfer.setTransferStatusId(set.getLong("transfer_status_id"));
+        transfer.setAccountFrom(set.getLong("account_from"));
+        transfer.setAccountTo(set.getLong("account_to"));
+        transfer.setAmount(set.getBigDecimal("amount"));
+        return transfer;
     }
 }

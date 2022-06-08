@@ -99,7 +99,11 @@ public class App {
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-		
+		consoleService.printUsers();
+        Long idChosen = 1L;
+        boolean test = true;
+
+        BigDecimal moneyToTransfer = consoleService.promptForBigDecimal("Enter amount: ");
 	}
 
 	private void viewPendingRequests() {
@@ -109,12 +113,47 @@ public class App {
 
 	private void sendBucks() {
 		// TODO Auto-generated method stub
-		
+        consoleService.printUsers();
+        Long id = checkIDIsNotUsers(1);
+        BigDecimal moneyToTransfer = consoleService.promptForBigDecimal("Enter amount: ");
+
+        if (moneyToTransfer.compareTo(transferService.getBalance(currentUser)) <= 0) {
+            System.out.println("you can send money");
+        }else {
+            System.out.println("not enough money");
+        }
 	}
 
 	private void requestBucks() {
 		// TODO Auto-generated method stub
-		
+        consoleService.printUsers();
 	}
+
+    private Long checkIDIsNotUsers(int transferType) {
+        String first = "";
+        String second = "";
+        Long idChosen;
+        if (transferType == 1) {
+            first = "Enter ID of user you are sending to (0 to cancel): ";
+            second = "You cannot send money to yourself.";
+        }else {
+            first = "Enter ID of user you are requesting from (0 to cancel): ";
+            second = "You cannot request money from yourself.";
+        }
+        while(true) {
+            idChosen = consoleService.promptForLong(first);
+            if (idChosen == 0) {
+                break;
+            } else if (idChosen.equals(currentUser.getUser().getId())) {
+                System.out.println(second);
+                continue;
+            } else if (!consoleService.userExists(idChosen)) {
+                System.out.println("There is no user with that ID.");
+                continue;
+            }
+            break;
+        }
+        return idChosen;
+    }
 
 }

@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
 import org.springframework.web.client.ResourceAccessException;
@@ -8,6 +9,7 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class TransferService {
 
@@ -17,19 +19,6 @@ public class TransferService {
     public TransferService(String baseAPI) {
         this.baseAPI = baseAPI;
     }
-
-//    public BigDecimal getBalance(AuthenticatedUser user) {
-//        HttpEntity<String> entity = makeEntity(user);
-//        BigDecimal balance = null;
-//        try {
-//            ResponseEntity<BigDecimal> response = restTemplate.exchange(baseAPI + "/balance", HttpMethod.GET, entity, BigDecimal.class);
-//            balance = response.getBody();
-//        } catch (RestClientResponseException | ResourceAccessException e) {
-//            System.out.println("TransferService.getBalance catch block");
-//            BasicLogger.log(e.getMessage());
-//        }
-//        return balance;
-//    }
 
     public BigDecimal getBalance(AuthenticatedUser user) {
         BigDecimal balance = null;
@@ -41,6 +30,15 @@ public class TransferService {
         }
         return balance;
     }
+
+
+    public List<Transfer> getTransfers() {
+
+    }
+//
+//    public BigDecimal sendMoney(BigDecimal moneyToSend) {
+//
+//    }
 
     private HttpEntity<String> makeEntity(AuthenticatedUser user) {
         HttpHeaders headers = new HttpHeaders();
