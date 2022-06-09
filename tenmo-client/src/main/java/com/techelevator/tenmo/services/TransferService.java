@@ -32,18 +32,45 @@ public class TransferService {
     }
 
 
-    public List<Transfer> getTransfers() {
-
+    public Transfer[] getTransfers() {
+        Transfer[] transfers = null;
+        try {
+            transfers = restTemplate.getForObject(baseAPI + "/transfers", Transfer[].class);
+        } catch (ResourceAccessException | RestClientResponseException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return transfers;
     }
-//
-//    public BigDecimal sendMoney(BigDecimal moneyToSend) {
-//
-//    }
+
+    public boolean sendMoney(BigDecimal amount, AuthenticatedUser user, Long IdToEndUser) {
+        Transfer transfer = new Transfer();
+        transfer.setTransferTypeId(1L);
+        transfer.setTransferStatusId(1L);
+        transfer.setAccountFrom(restTemplate.getForObject(baseAPI + "user-account/" + user.getUser().getId(), Long.class));
+        transfer.setAccountTo(restTemplate.getForObject(baseAPI + "user-account/" + IdToEndUser, Long.class));
+        transfer.setAmount(amount);
+        HttpEntity<Transfer> entity = makeTransferEntity(transfer, user);
+        try {
+            restTemplate.postForObject(baseAPI + "new-transfer", entity, Boolean.class);
+            restTemplate.put(baseAPI + "decrease-balance", entity, Boolean.class);
+        }catch (RestClientResponseException | ResourceAccessException e) {
+            BasicLogger.log(e.getMessage());
+            return false;
+        }
+        return true;
+    }
 
     private HttpEntity<String> makeEntity(AuthenticatedUser user) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setBearerAuth(user.getToken());
         return new HttpEntity<>(user.getUser().getUsername(), headers);
+    }
+
+    private HttpEntity<Transfer> makeTransferEntity(Transfer transfer, AuthenticatedUser user) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(user.getToken());
+        return new HttpEntity<>(transfer, headers);
     }
 }

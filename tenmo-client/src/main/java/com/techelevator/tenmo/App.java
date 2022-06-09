@@ -99,11 +99,7 @@ public class App {
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-		consoleService.printUsers();
-        Long idChosen = 1L;
-        boolean test = true;
-
-        BigDecimal moneyToTransfer = consoleService.promptForBigDecimal("Enter amount: ");
+        consoleService.printTransfers(transferService.getTransfers());
 	}
 
 	private void viewPendingRequests() {
@@ -115,12 +111,15 @@ public class App {
 		// TODO Auto-generated method stub
         consoleService.printUsers();
         Long id = checkIDIsNotUsers(1);
+        if (id == 0) return;
+
         BigDecimal moneyToTransfer = consoleService.promptForBigDecimal("Enter amount: ");
 
-        if (moneyToTransfer.compareTo(transferService.getBalance(currentUser)) <= 0) {
+        if (moneyToTransfer.compareTo(transferService.getBalance(currentUser)) <= 0 && moneyToTransfer.intValue() > 0) {
             System.out.println("you can send money");
+            transferService.sendMoney(moneyToTransfer, currentUser, id);
         }else {
-            System.out.println("not enough money");
+            System.out.println("The amount you are requesting to send is either more than you have, or less than or equal to $0");
         }
 	}
 

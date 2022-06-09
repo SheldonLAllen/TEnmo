@@ -12,13 +12,15 @@ public interface UserDao {
 
     User findByUsername(String username);
 
+    String findUsernameByAccountId(Long accountId);
+
     int findIdByUsername(String username);
 
     boolean create(String username, String password);
 
     BigDecimal getBalance(Long id);
 
-    List<Transfer> getTransfers();
+    Long getAccountIdByUserId(Long id);
 
 //    BigDecimal requestBucks(BigDecimal bucks, Long id);
 }

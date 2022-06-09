@@ -2,6 +2,7 @@ package com.techelevator.tenmo.services;
 
 
 import com.fasterxml.jackson.databind.introspect.TypeResolutionContext;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.util.BasicLogger;
@@ -109,6 +110,28 @@ public class ConsoleService {
             System.out.println("-----------------------------------------");
         } catch (ResourceAccessException | RestClientResponseException e) {
             BasicLogger.log(e.getMessage());
+        }
+    }
+
+    public void printTransfers(Transfer[] transfers) {
+        System.out.println("-----------------------------------------");
+        System.out.println("Transfers");
+        System.out.println("ID      From     To         Amount");
+        System.out.println("-----------------------------------------");
+        Long id;
+        String from;
+        String to;
+        BigDecimal balance;
+        if (transfers == null) {
+            System.out.println("There are no transfers to display");
+        }else {
+            for (Transfer transfer : transfers) {
+                id = transfer.getTransferId();
+                from = restTemplate.getForObject(baseAPI + "/users/" + transfer.getAccountFrom(), String.class);
+                to = restTemplate.getForObject(baseAPI + "/users/" + transfer.getAccountTo(), String.class);
+                balance = transfer.getAmount();
+                System.out.println(id + "   " + from + "   " + to + "   " + balance.toString());
+            }
         }
     }
 

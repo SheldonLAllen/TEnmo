@@ -35,6 +35,13 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
+    public String findUsernameByAccountId(Long accountId) {
+        //TODO: This SQL is not returning the correct response
+        String sql = "SELECT username from tenmo_user as tu join account as a on a.user_id = tu.user_id where a.account_id = ?";
+        return jdbcTemplate.queryForObject(sql, String.class, accountId);
+    }
+
+    @Override
     public List<User> findAll() {
         List<User> users = new ArrayList<>();
         String sql = "SELECT user_id, username, password_hash FROM tenmo_user;";
@@ -89,17 +96,10 @@ public class JdbcUserDao implements UserDao {
     }
 
     @Override
-    public List<Transfer> getTransfers() {
-        String sql = "SELECT * FROM transfer";
-        SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-        List<Transfer> transfers = new ArrayList<>();
-        while (results.next()) {
-            transfers.add(mapRowToTransfer(results));
-        }
-        return transfers;
+    public Long getAccountIdByUserId(Long id) {
+        String sql = "SELECT account_id from account where user_id = ?";
+        return jdbcTemplate.queryForObject(sql, Long.class, id);
     }
-
-
 
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();
@@ -109,16 +109,5 @@ public class JdbcUserDao implements UserDao {
         user.setActivated(true);
         user.setAuthorities("USER");
         return user;
-    }
-
-    private Transfer mapRowToTransfer(SqlRowSet set) {
-        Transfer transfer = new Transfer();
-        transfer.setTransferId(set.getLong("transfer_id"));
-        transfer.setTransferTypeId(set.getLong("transfer_type_id"));
-        transfer.setTransferStatusId(set.getLong("transfer_status_id"));
-        transfer.setAccountFrom(set.getLong("account_from"));
-        transfer.setAccountTo(set.getLong("account_to"));
-        transfer.setAmount(set.getBigDecimal("amount"));
-        return transfer;
     }
 }
