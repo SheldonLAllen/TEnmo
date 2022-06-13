@@ -9,7 +9,13 @@ public interface TransferDao {
 
     List<Transfer> getTransfers();
 
+    Transfer getTransferById(Long id);
+
+    List<Transfer> getTransfersByAccountId(Long accountId);
+
     boolean postTransfer(Transfer transfer);
 
     boolean decreaseBalance(BigDecimal amountToDecrease, Long accountId);
+
+    boolean increaseBalance(BigDecimal amountToIncrease, Long accountId);
 }

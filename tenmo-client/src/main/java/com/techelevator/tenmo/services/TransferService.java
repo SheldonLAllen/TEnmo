@@ -42,10 +42,21 @@ public class TransferService {
         return transfers;
     }
 
+    public Transfer[] getTransfersByAccountId(Long userId) {
+        Transfer[] transfers = null;
+        Long accountId = restTemplate.getForObject(baseAPI + "/user-account/" + userId, Long.class);
+        try {
+            transfers = restTemplate.getForObject(baseAPI + "/transfers/" + accountId, Transfer[].class);
+        } catch (ResourceAccessException | RestClientResponseException e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return transfers;
+    }
+
     public boolean sendMoney(BigDecimal amount, AuthenticatedUser user, Long IdToEndUser) {
         Transfer transfer = new Transfer();
-        transfer.setTransferTypeId(1L);
-        transfer.setTransferStatusId(1L);
+        transfer.setTransferTypeId(2L);
+        transfer.setTransferStatusId(2L);
         transfer.setAccountFrom(restTemplate.getForObject(baseAPI + "user-account/" + user.getUser().getId(), Long.class));
         transfer.setAccountTo(restTemplate.getForObject(baseAPI + "user-account/" + IdToEndUser, Long.class));
         transfer.setAmount(amount);
@@ -53,6 +64,7 @@ public class TransferService {
         try {
             restTemplate.postForObject(baseAPI + "new-transfer", entity, Boolean.class);
             restTemplate.put(baseAPI + "decrease-balance", entity, Boolean.class);
+            restTemplate.put(baseAPI + "increase-balance", entity, Boolean.class);
         }catch (RestClientResponseException | ResourceAccessException e) {
             BasicLogger.log(e.getMessage());
             return false;

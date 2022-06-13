@@ -99,7 +99,11 @@ public class App {
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-        consoleService.printTransfers(transferService.getTransfers());
+        consoleService.printTransfers(transferService.getTransfersByAccountId(currentUser.getUser().getId()));
+        Long selection = consoleService.promptForLong("Please enter transfer ID to view details (0 to cancel): ");
+        if (selection != 0) {
+            consoleService.printTransfer(selection);
+        }
 	}
 
 	private void viewPendingRequests() {

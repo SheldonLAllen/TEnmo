@@ -132,7 +132,35 @@ public class ConsoleService {
                 balance = transfer.getAmount();
                 System.out.println(id + "   " + from + "   " + to + "   " + balance.toString());
             }
+            System.out.println("-----------------------------------------");
         }
+    }
+
+    public void printTransfer(Long id) {
+        System.out.println("-----------------------------------------");
+        System.out.println("Transfer Details");
+        System.out.println("-----------------------------------------");
+        Transfer transfer = null;
+        try {
+            transfer = restTemplate.getForObject(baseAPI + "/transfer/" + id, Transfer.class);
+        } catch (ResourceAccessException | RestClientResponseException e) {
+            BasicLogger.log(e.getMessage());
+        }
+
+        if (transfer == null) {
+            System.out.println("No transfer exists for the given id:" + id);
+        } else {
+            printSingleTransfer(transfer);
+        }
+    }
+
+    public void printSingleTransfer(Transfer transfer) {
+        System.out.println("Id: " + transfer.getTransferId());
+        System.out.println("From: " + transfer.getAccountFrom());
+        System.out.println("To: " + transfer.getAccountTo());
+        System.out.println("Type: " + transfer.getTransferTypeId());
+        System.out.println("Status: " + transfer.getTransferStatusId());
+        System.out.println("Amount: $" + transfer.getAmount());
     }
 
     public boolean userExists(Long id) {

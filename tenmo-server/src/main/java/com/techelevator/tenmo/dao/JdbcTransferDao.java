@@ -32,6 +32,28 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
+    public List<Transfer> getTransfersByAccountId(Long accountId) {
+        String sql = "SELECT * FROM transfer WHERE account_from = ? OR account_to = ?";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sql, accountId, accountId);
+        List<Transfer> transfers = new ArrayList<>();
+        while (results.next()) {
+            transfers.add(mapRowToTransfer(results));
+        }
+        return transfers;
+    }
+
+    @Override
+    public Transfer getTransferById(Long id) {
+        String sql = "SELECT * FROM transfer where transfer_id = ?";
+        SqlRowSet result = jdbcTemplate.queryForRowSet(sql, id);
+        Transfer transfer = null;
+        while (result.next()) {
+            transfer = mapRowToTransfer(result);
+        }
+        return transfer;
+    }
+
+    @Override
     public boolean postTransfer(Transfer transfer) {
         String sql = "insert into transfer(transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount) values(DEFAULT, ?, ?, ?, ?, ?)";
         try {
@@ -47,6 +69,17 @@ public class JdbcTransferDao implements TransferDao {
         String sql = "update account set balance = balance - ? where account_id = ?";
         try {
             jdbcTemplate.update(sql, amountToDecrease, accountId);
+        } catch (DataAccessException e) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean increaseBalance(BigDecimal amountToIncrease, Long accountId) {
+        String sql = "update account set balance = balance + ? where account_id = ?";
+        try {
+            jdbcTemplate.update(sql, amountToIncrease, accountId);
         } catch (DataAccessException e) {
             return false;
         }

@@ -34,6 +34,16 @@ public class TransferController {
     public List<Transfer> getTransfers() {
         return transferDao.getTransfers();
     }
+    
+    @GetMapping("/transfers/{accountId}")
+    public List<Transfer> getTransfersByAccountId (@PathVariable Long accountId) {
+        return transferDao.getTransfersByAccountId(accountId);
+    }
+
+    @GetMapping("/transfer/{id}")
+    public Transfer getTransferById(@PathVariable Long id) {
+        return transferDao.getTransferById(id);
+    }
 
     @PostMapping("/new-transfer")
     public boolean postTransfer(@RequestBody Transfer transfer) {
@@ -44,4 +54,10 @@ public class TransferController {
     public boolean decreaseBalance(@RequestBody Transfer transfer) {
         return transferDao.decreaseBalance(transfer.getAmount(), transfer.getAccountFrom());
     }
+
+    @PutMapping("/increase-balance")
+    public boolean increaseBalance(@RequestBody Transfer transfer) {
+        return transferDao.increaseBalance(transfer.getAmount(), transfer.getAccountTo());
+    }
+
 }
